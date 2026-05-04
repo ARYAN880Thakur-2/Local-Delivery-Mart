@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vendor OS | Local Delivery Mart</title>
+  <meta name="description" content="Manage inventory and orders in real-time.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css">
+  <script src="./js/data-engine.js"></script>
+</head>
+<body style="background-color: #f8fafc;">
+  <header>
+    <div class="brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+      Vendor OS
+    </div>
+    <div class="nav-links">
+      <div class="live-indicator">
+        <div class="live-dot"></div> Live Sync Active
+      </div>
+      <a href="./index.html">Consumer Storefront</a>
+      <a href="./login.html" onclick="localStorage.clear()" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 4px 12px; border-radius: 8px; font-weight: 600;">Logout</a>
+    </div>
+  </header>
+
+  <main style="max-width: 1400px;">
+    <!-- Dashboard Stats -->
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Products</div>
+        <div class="stat-value" id="stat-products">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Orders</div>
+        <div class="stat-value" id="stat-orders">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Revenue</div>
+        <div class="stat-value" id="stat-revenue">₹0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pending</div>
+        <div class="stat-value" id="stat-pending" style="color: #d97706;">0</div>
+      </div>
+    </div>
+
+    <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr;">
+      <!-- Orders Section -->
+      <section>
+        <div class="card">
+          <h2 class="card-title">Live Order Stream</h2>
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer</th>
+                  <th>Amount</th>
+                  <th>Time</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="orders-list">
+                <tr><td colspan="6">Loading orders...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Inventory Section -->
+      <section>
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h2 class="card-title" style="margin-bottom: 0; border: none; padding: 0;">Inventory Management</h2>
+            <button class="btn" style="width: auto; padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="openAddProductModal()">+ Add Product</button>
+          </div>
+          <p style="margin-bottom: 1rem; color: var(--text-gray); font-size: 0.9rem;">
+            Changes here are synced instantly to the consumer app.
+          </p>
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Vendor</th>
+                  <th>Item</th>
+                  <th>Price</th>
+                  <th>Stock</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="vendor-inventory-list">
+                <tr><td colspan="5">Loading inventory...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Receipt Modal -->
+  <div id="receipt-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div class="receipt-header">
+        <h2 style="font-weight: 800; color: var(--primary-color);">LocalMart</h2>
+        <div style="font-size: 0.8rem; color: var(--text-gray);">Digital Receipt / SMS Preview</div>
+      </div>
+      <div class="receipt-body" id="receipt-content"></div>
+      <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+        <button class="btn" style="flex: 1;" onclick="sendSMS()">Send via SMS</button>
+        <button class="btn" style="flex: 1; background: var(--text-gray);" onclick="closeReceipt()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Product Modal -->
+  <div id="add-product-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 500px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h2 style="font-weight: 800; color: var(--text-dark);">Add New Product</h2>
+        <button class="btn" style="background: transparent; color: var(--text-gray); width: auto; padding: 0.2rem 0.6rem;" onclick="closeAddProductModal()">✕</button>
+      </div>
+      <div class="form-group">
+        <label>Product Name</label>
+        <input type="text" id="new-product-name" class="form-control" placeholder="e.g. Amul Milk 500ml">
+      </div>
+      <div class="form-group">
+        <label>Price (₹)</label>
+        <input type="number" id="new-product-price" class="form-control" placeholder="0.00" min="0" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Stock Quantity</label>
+        <input type="number" id="new-product-qty" class="form-control" placeholder="0" min="0">
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <input type="text" id="new-product-category" class="form-control" placeholder="e.g. Dairy, Snacks, Main Course">
+      </div>
+      <div class="form-group">
+        <label>Vendor Type</label>
+        <select id="new-product-type" class="form-control">
+          <option value="Supermarket">Supermarket</option>
+          <option value="Restaurant">Restaurant</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Vendor Name</label>
+        <input type="text" id="new-product-vendor" class="form-control" placeholder="e.g. Reliance Retail">
+      </div>
+      <button class="btn" onclick="addNewProduct()">Add Product</button>
+    </div>
+  </div>
+
+  <script src="./js/vendor.js"></script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delivery Partner | Local Delivery Mart</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css">
+  <script src="./js/data-engine.js"></script>
+</head>
+<body style="background-color: #f1f5f9;">
+  <header>
+    <div class="brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+      Delivery Partner
+    </div>
+    <div class="nav-links">
+      <span id="partner-name" style="font-weight: 600; font-size: 0.9rem; color: var(--primary-color);">Rider Active</span>
+      <a href="./login.html" onclick="localStorage.clear()">Logout</a>
+    </div>
+  </header>
+
+  <main style="max-width: 800px; margin: 0 auto; padding: 1.5rem;">
+    <div class="card" style="margin-bottom: 2rem; background: var(--primary-color); color: white;">
+      <h2 style="color: white; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.5rem;">Quick Stats</h2>
+      <div style="display: flex; gap: 2rem; margin-top: 1rem;">
+        <div>
+          <div style="font-size: 0.8rem; opacity: 0.8;">Today's Deliveries</div>
+          <div style="font-size: 1.5rem; font-weight: 800;">12</div>
+        </div>
+        <div>
+          <div style="font-size: 0.8rem; opacity: 0.8;">Earnings</div>
+          <div style="font-size: 1.5rem; font-weight: 800;">₹840</div>
+        </div>
+        <div>
+          <div style="font-size: 0.8rem; opacity: 0.8;">Rating</div>
+          <div style="font-size: 1.5rem; font-weight: 800;">4.9 ★</div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="card-title">Available Deliveries</h2>
+    <div id="delivery-list">
+      <p style="text-align: center; color: var(--text-gray); padding: 2rem;">Searching for nearby orders...</p>
+    </div>
+  </main>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <script>
+    // Data Engine powered - Zero Backend needed
+    if (localStorage.getItem('userRole') !== 'delivery') {
+      window.location.href = 'login.html';
+    }
+
+    function loadDeliveries() {
+      const orders = DataEngine.getOrders();
+      const available = orders.filter(o => o.status === 'Accepted');
+      renderDeliveries(available);
+    }
+
+    // Sync simulation
+    DataEngine.onUpdate(() => {
+      loadDeliveries();
+    });
+
+    function renderDeliveries(orders) {
+      const listEl = document.getElementById('delivery-list');
+      if (orders.length === 0) {
+        listEl.innerHTML = '<div class="card" style="text-align: center; color: var(--text-gray);">No pending pickups right now.</div>';
+        return;
+      }
+
+      listEl.innerHTML = orders.map(order => `
+        <div class="card" style="margin-bottom: 1rem; border-left: 5px solid var(--primary-color);">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span style="font-weight: 800; color: var(--text-dark);">Order #${order.id}</span>
+            <span style="font-size: 0.8rem; background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 99px; font-weight: 600;">READY</span>
+          </div>
+          <div style="font-size: 0.9rem; color: var(--text-gray); margin-bottom: 1rem;">
+            <strong>To:</strong> ${order.customer_name}<br>
+            <strong>Address:</strong> ${order.address}
+          </div>
+          <button class="btn" onclick="DataEngine.updateOrderStatus(${order.id}, 'Delivered')">Mark Delivered</button>
+        </div>
+      `).join('');
+    }
+
+    // Initial load
+    loadDeliveries();
+  </script>
+</body>
+</html>

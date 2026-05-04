@@ -1,0 +1,11 @@
+node_modules/
+.env
+*.db
+*.db-*
+.vscode/
+dist/
+build/
+RUN_ME.bat
+server.js
+package-lock.json
+package.json
