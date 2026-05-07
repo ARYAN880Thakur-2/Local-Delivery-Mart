@@ -1,6 +1,6 @@
-# 🛒 LocalMart - Hyperlocal Community Commerce Engine
+# 🛒 Local Delivery Mart Community Commerce Engine
 
-LocalMart is a high-performance hyperlocal commerce platform designed for Tier 2/3 markets. It connects local vendors (supermarkets and restaurants) with community consumers in real-time, providing a seamless, low-friction shopping experience.
+Local Delivery Mart is a high-performance local-delivery-mart commerce platform designed for Tier 2/3 markets. It connects local vendors (supermarkets and restaurants) with community consumers in real-time, providing a seamless, low-friction shopping experience.
 
 ## 🚀 Features
 
