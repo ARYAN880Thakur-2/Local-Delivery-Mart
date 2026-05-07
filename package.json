@@ -1,7 +1,7 @@
 {
-  "name": "hyperlocal-commerce",
+  "name": "local-delivery-mart-commerce",
   "version": "1.0.0",
-  "description": "Hyperlocal Community-First Commerce Engine for Tier 2/3 India",
+  "description": "local-local-delivery-mart- Community-First Commerce Engine for Tier 2/3 India",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
